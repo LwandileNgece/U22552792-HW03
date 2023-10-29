@@ -1,0 +1,706 @@
+﻿@model U22552792_HW03.Models.DataViewModel
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Maintain";
+}
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+</head>
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <h2>Authors</h2>
+            <p>
+                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#AuthorModal">Create</a>
+            </p>
+            @*Author Create Modal*@
+            <div class="modal fade" id="AuthorModal">
+                <!-- Modal content goes here -->
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="modal-title">
+                                Author information
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            @using (Html.BeginForm("Create", "authors", FormMethod.Post, new { id = "authorForm" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewAuthor.name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewAuthor.name, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewAuthor.name, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewAuthor.surname, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewAuthor.surname, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewAuthor.surname, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" id="btnSaveAuthor" value="Create" class="btn btn-primary">Save</button>
+                                    <button type="button" id="btnCancel" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*Edit Modal*@
+            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel">Author</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            @using (Html.BeginForm("Edit", "authors", FormMethod.Post, new { id = "editForm" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="form-horizontal">
+                                    <h4>author</h4>
+                                    <hr />
+                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                    @Html.HiddenFor(model => model.NewAuthor.authorId)
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.NewAuthor.name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.NewAuthor.name, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.NewAuthor.name, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.NewAuthor.surname, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.NewAuthor.surname, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.NewAuthor.surname, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-offset-2 col-md-10">
+                                            <input type="submit" value="Save" class="btn btn-default" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*Author Table*@
+            <table class="table table-light table-striped">
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Surname
+                    </th>
+                    <th>
+                        Action
+                    </th>
+                </tr>
+                <tbody id="itemsContainer">
+                    @foreach (var item in Model.Authors)
+                    {
+                        <tr class="item">
+                            <td>
+                                @Html.DisplayFor(modelItem => item.name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.surname)
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary AuthorEdit-button"
+                                        data-toggle="modal" data-target="#editModal"
+                                        data-authorid="@item.authorId" data-name="@item.name" data-surname="@item.surname">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-danger delete-button"
+                                        data-toggle="modal" data-target="#deleteModal"
+                                        data-authorid="@item.authorId">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div id="paginationControls">
+                <button id="prevPage" class="btn btn-primary">Previous</button>
+                <span id="currentPage"></span>
+                <button id="nextPage" class="btn btn-primary">Next</button>
+            </div>
+            @*Author Delete Modal*@
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this record?</p>
+                        </div>
+                        <div class="modal-footer">
+                            @using (Html.BeginForm("Delete", "authors", new { id = 0 }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" id="deleteAuthorId" name="id" /> <!-- Hidden field to store the item ID to be deleted -->
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <input type="submit" value="Delete" class="btn btn-danger" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <h2>Types</h2>
+            <p>
+                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#TypeModal">Create</a>
+            </p>
+            @*Type Modal*@
+            <div class="modal fade" id="TypeModal">
+                <!-- Modal content goes here -->
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="modal-title">
+                                Type information
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            @using (Html.BeginForm("Create", "types", FormMethod.Post, new { id = "typeForm" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewType.name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewType.name, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewType.name, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" id="btnSaveAuthor" value="Create" class="btn btn-primary">Save</button>
+                                    <button type="button" id="btnCancel" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*Type Edit Modal*@
+            <div class="modal fade" id="edit1Modal" tabindex="-1" aria-labelledby="edit1ModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="edit1ModalLabel">Type</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            @using (Html.BeginForm("Edit", "types", FormMethod.Post, new { id = "edit1Form" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="form-horizontal">
+                                    <h4>type</h4>
+                                    <hr />
+                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                    @Html.HiddenFor(model => model.NewType.typeId)
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.NewType.name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+                                            @Html.EditorFor(model => model.NewType.name, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.NewType.name, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-offset-2 col-md-10">
+                                            <input type="submit" value="Save" class="btn btn-default" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*Type Table*@
+            <table class="table table-light table-striped">
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Action
+                    </th>
+                </tr>
+                <tbody id="itemsContainer1">
+                    @foreach (var item in Model.Types)
+                    {
+                        <tr class="item1">
+                            <td>
+                                @Html.DisplayFor(modelItem => item.name)
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary TypeEdit-button"
+                                        data-toggle="modal" data-target="#edit1Modal"
+                                        data-typeid="@item.typeId" data-name="@item.name">
+                                    Edit
+                                </button>
+                                <button type="button" class="btn btn-danger delete1-button"
+                                        data-toggle="modal" data-target="#delete1Modal"
+                                        data-typeid="@item.typeId">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div id="paginationControls1">
+                <button id="prevPage1" class="btn btn-primary">Previous</button>
+                <span id="currentPage1"></span>
+                <button id="nextPage1" class="btn btn-primary">Next</button>
+            </div>
+            @*Type Delete Modal*@
+            <div class="modal fade" id="delete1Modal" tabindex="-1" role="dialog" aria-labelledby="deleteModal1Label" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModal1Label">Confirm Delete</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this record?</p>
+                        </div>
+                        <div class="modal-footer">
+                            @using (Html.BeginForm("Delete", "types", new { id = 0 }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" id="deleteTypeId" name="id" /> <!-- Hidden field to store the item ID to be deleted -->
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <input type="submit" value="Delete" class="btn btn-danger" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <h2>Borrows</h2>
+    <p>
+        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#BorrowModal">Create</a>
+    </p>
+    @*Borrow Modal*@
+    <div class="modal fade" id="BorrowModal">
+        <!-- Modal content goes here -->
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        Borrow information
+                    </div>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm("Create", "borrows", FormMethod.Post, new { id = "borrowForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NewBorrow.studentId, "studentId", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownListFor(model => model.NewBorrow.studentId, new SelectList(Model.Students, "studentId", "name"), "-- Select Student --", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.NewBorrow.studentId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NewBorrow.bookId, "bookId", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownListFor(model => model.NewBorrow.bookId, new SelectList(Model.Books, "bookId", "name"), "-- Select Book --", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.NewBorrow.bookId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NewBorrow.takenDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.NewBorrow.takenDate, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.NewBorrow.takenDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NewBorrow.broughtDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.NewBorrow.broughtDate, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.NewBorrow.broughtDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" id="btnSaveBorrow" value="Create" class="btn btn-primary">Save</button>
+                            <button type="button" id="btnCancel" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @*Borrow Edit Modal*@
+    <div class="modal fade" id="edit2Modal" tabindex="-1" aria-labelledby="edit2ModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="edit2ModalLabel">Borrow</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm("Edit", "borrows", FormMethod.Post, new { id = "edit2Form" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-horizontal">
+                            <h4>borrow</h4>
+                            <hr />
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            @Html.HiddenFor(model => model.NewBorrow.borrowId)
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NewBorrow.studentId, "studentId", htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.DropDownListFor(model => model.NewBorrow.studentId, new SelectList(Model.Students, "studentId", "name"), "-- Select Student --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.NewBorrow.studentId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NewBorrow.bookId, "bookId", htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.DropDownListFor(model => model.NewBook.bookId, new SelectList(Model.Books, "bookId", "name"), "-- Select Book --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.NewBorrow.bookId, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NewBorrow.takenDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.NewBorrow.takenDate, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.NewBorrow.takenDate, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NewBorrow.broughtDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.NewBorrow.broughtDate, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.NewBorrow.broughtDate, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <input type="submit" value="Save" class="btn btn-default" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-light table-striped">
+        <tr>
+            <th>
+                Taken Date
+            </th>
+            <th>
+                Brought Date
+            </th>
+            <th>
+                Book Name
+            </th>
+            <th>
+                Student Name
+            </th>
+        </tr>
+        <tbody id="itemsContainer2">
+            @foreach (var item in Model.Borrows)
+            {
+                <tr class="item2">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.takenDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.broughtDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.book.name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.student.name)
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-primary BorrowEdit-button"
+                                data-toggle="modal" data-target="#edit2Modal"
+                                data-borrowid="@item.borrowId" data-takendate="@item.takenDate" data-broughtdate="@item.broughtDate" data-bookid="@item.bookId" data-studentid="@item.studentId">
+                            Edit
+                        </button>
+                        <button type="button" class="btn btn-danger delete2-button"
+                                data-toggle="modal" data-target="#delete2Modal"
+                                data-borrowid="@item.borrowId">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div id="paginationControls2">
+        <button id="prevPage2" class="btn btn-primary">Previous</button>
+        <span id="currentPage2"></span>
+        <button id="nextPage2" class="btn btn-primary">Next</button>
+    </div>
+    @*Type Delete Modal*@
+    <div class="modal fade" id="delete2Modal" tabindex="-1" role="dialog" aria-labelledby="deleteModal2Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModal2Label">Confirm Delete</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this record?</p>
+                </div>
+                <div class="modal-footer">
+                    @using (Html.BeginForm("Delete", "types", new { id = 0 }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" id="deleteBorrowId" name="id" /> <!-- Hidden field to store the item ID to be deleted -->
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@*Author Pagination*@
+<script>
+    $(document).ready(function () {
+        var itemsPerPage = 10;
+        var currentPage = 1;
+
+        function showItems(startIndex, endIndex) {
+            $('#itemsContainer tr.item').hide();
+            $('#itemsContainer tr.item').slice(startIndex, endIndex).show();
+            $('#currentPage').text('Page ' + currentPage);
+        }
+
+        showItems(0, itemsPerPage);
+
+        $('#nextPage').on('click', function () {
+            var totalItems = $('#itemsContainer tr.item').length;
+            var totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            if (currentPage < totalPages) {
+                currentPage++;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+
+        $('#prevPage').on('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+    });
+</script>
+@*Type Pagination*@
+<script>
+    $(document).ready(function () {
+        var itemsPerPage = 10;
+        var currentPage = 1;
+
+        function showItems(startIndex, endIndex) {
+            $('#itemsContainer1 tr.item1').hide();
+            $('#itemsContainer1 tr.item1').slice(startIndex, endIndex).show();
+            $('#currentPage1').text('Page ' + currentPage);
+        }
+
+        showItems(0, itemsPerPage);
+
+        $('#nextPage1').on('click', function () {
+            var totalItems = $('#itemsContainer1 tr.item1').length;
+            var totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            if (currentPage < totalPages) {
+                currentPage++;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+
+        $('#prevPage1').on('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+    });
+</script>
+@*Borrow Pagination*@
+<script>
+    $(document).ready(function () {
+        var itemsPerPage = 10;
+        var currentPage = 1;
+
+        function showItems(startIndex, endIndex) {
+            $('#itemsContainer2 tr.item2').hide();
+            $('#itemsContainer2 tr.item2').slice(startIndex, endIndex).show();
+            $('#currentPage2').text('Page ' + currentPage);
+        }
+
+        showItems(0, itemsPerPage);
+
+        $('#nextPage2').on('click', function () {
+            var totalItems = $('#itemsContainer2 tr.item2').length;
+            var totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            if (currentPage < totalPages) {
+                currentPage++;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+
+        $('#prevPage1').on('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+    });
+</script>
+
+@*Author Edit*@
+<script>
+    $(document).ready(function () {
+        $('.AuthorEdit-button').click(function () {
+            var authorId = $(this).data('authorid');
+            var name = $(this).data('name');
+            var surname = $(this).data('surname');
+
+            $('#editModal #NewAuthor_authorId').val(authorId);
+            $('#editModal #NewAuthor_name').val(name);
+            $('#editModal #NewAuthor_surname').val(surname);
+        });
+    });
+</script>
+@*Type Edit*@
+<script>
+    $(document).ready(function () {
+        $('.TypeEdit-button').click(function () {
+            var typeId = $(this).data('typeid');
+            var name = $(this).data('name');
+
+            $('#edit1Modal #NewType_typeId').val(typeId);
+            $('#edit1Modal #NewType_name').val(name);
+        });
+    });
+</script>
+@*Borrow Edit*@
+<script>
+    $(document).ready(function () {
+        $('.BorrowEdit-button').click(function () {
+            var borrowId = $(this).data('borrowid');
+            var takendate = $(this).data('takendate');
+            var broughtdate = $(this).data('broughtdate');
+            var studentid = $(this).data('studentid');
+            var bookid = $(this).data('bookid');
+
+            $('#edit2Modal #NewBorrow_borrowId').val(borrowId);
+            $('#edit2Modal #NewBorrow_takenDate').val(takendate);
+            $('#edit2Modal #NewBorrow_broughtDate').val(broughtdate);
+            $('#edit2Modal #NewBorrow_studentId').val(studentid);
+            $('#edit2Modal #NewBorrow_bookId').val(bookid);
+        });
+    });
+</script>
+@*Author Delete*@
+<script>
+    $('.delete-button').click(function () {
+        var itemId = $(this).data('authorid'); // Get the item ID from the data-taskid attribute
+        $('#deleteAuthorId').val(itemId); // Set the value of the hidden input field
+
+        // Update the form's action URL to include the item ID
+        $('#deleteModal form').attr('action', '/authors/Delete/' + itemId);
+    });
+</script>
+@*Type Delete*@
+<script>
+    $('.delete1-button').click(function () {
+        var itemId = $(this).data('typeid'); // Get the item ID from the data-taskid attribute
+        $('#deleteTypeId').val(itemId); // Set the value of the hidden input field
+
+        // Update the form's action URL to include the item ID
+        $('#delete1Modal form').attr('action', '/types/Delete/' + itemId);
+    });
+</script>
+@*Borrow Delete*@
+<script>
+    $('.delete2-button').click(function () {
+        var itemId = $(this).data('borrowid'); // Get the item ID from the data-taskid attribute
+        $('#deleteBorrowId').val(itemId); // Set the value of the hidden input field
+
+        // Update the form's action URL to include the item ID
+        $('#delete2Modal form').attr('action', '/borrows/Delete/' + itemId);
+    });
+</script>

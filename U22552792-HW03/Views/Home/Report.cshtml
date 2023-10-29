@@ -1,0 +1,155 @@
+﻿@model U22552792_HW03.Models.DataViewModel
+@{
+    ViewBag.Title = "Report";
+}
+
+<h2>Most Borrowed Books Report</h2>
+
+<div id="chart_div"></div>
+
+<form id="fileForm" method="post" asp-action="SaveReport">
+    <div class="form-group mt-3">
+        <label for="fileFormat">Select File Format:</label>
+        <select id="fileFormat" name="FileType" class="form-control">
+            <option value="png">PNG</option>
+            <option value="jpg">JPG</option>
+            <option value="pdf">PDF</option>
+        </select>
+        <!-- Hidden field for file type -->
+        <input type="hidden" id="hiddenFileType" name="FileType" />
+    </div>
+    <div class="form-group">
+        <label for="filename">Enter File Name:</label>
+        <input type="text" id="filename" name="filename" class="form-control" placeholder="Enter file name">
+    </div>
+    <div class="form-group">
+        <div class="rich-text-container">
+            <label for="description">Description:</label>
+            <textarea style="resize: both" id="description" name="description"></textarea>
+        </div>
+    </div>6
+    <button id="saveReportBtn" class="btn btn-success" type="submit">Save Report</button>
+</form>
+
+<h3>Document Archive</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>File Type</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Reports)
+        {
+            <tr>
+                <td class="filename">@item.Name</td>
+                <td class="fileFormat">@item.File_Type</td>
+                <td>@item.Description</td>
+                <td>
+                    <button class="btn btn-primary downloadChartBtn" type="button"
+                            data-filename="@item.Name" data-fileType="@item.File_Type">
+                        Download Chart
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts {
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+    google.charts.load('current', {
+        packages: ['corechart', 'bar']
+    });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Book Title');
+        data.addColumn('number', 'Borrow Count');
+        data.addRows([
+            @foreach (var book in ViewBag.ChartData)
+            {
+                @: ['@book.BookTitle', @book.BorrowCount],
+            }
+        ]);
+
+        var options = {
+            title: 'Popular Books Report',
+            chartArea: { width: '60%', height: '70%' },
+            hAxis: {
+                title: 'Borrow Count',
+                minValue: 0,
+                textStyle: {
+                    bold: true,
+                    fontSize: 12,
+                    color: '#4caf50'
+                },
+                titleTextStyle: {
+                    bold: true,
+                    fontSize: 16,
+                    color: '#4caf50'
+                }
+            },
+            vAxis: {
+                title: 'Book Title',
+                textStyle: {
+                    fontSize: 14,
+                    bold: true,
+                    color: '#000000'
+                },
+                titleTextStyle: {
+                    fontSize: 16,
+                    bold: true,
+                    color: '#000000'
+                }
+            },
+            bars: 'vertical',
+            backgroundColor: '#f8f9fa',
+            colors: ['#4caf50']
+        };
+
+
+        var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+
+        function DownloadChart(filename, fileType) {
+            // Get the chart element by its ID
+            var chartElement = document.getElementById('chart_div');
+
+            // Create a new image URI using the chart data
+            var imgUri = chart.getImageURI();
+
+            // Create a link element to trigger the download
+            var link = document.createElement('a');
+            link.href = imgUri;
+            link.download = filename + '.' + fileType;
+
+            // Append the link to the document and trigger the download
+            document.body.appendChild(link);
+            link.click();
+
+            // Remove the link from the document after download
+            document.body.removeChild(link);
+        }
+        // Export and download the chart as an image or PDF
+        $(document).on('click', '.downloadChartBtn', function () {
+            var filename = $(this).data('filename'); // Use lowercase 'filename'
+            var fileType = $(this).data('filetype'); // Use lowercase 'filetype'
+            DownloadChart(filename, fileType);
+        });
+
+        $('#saveReportBtn').on('click', function () {
+            // Trigger form submission
+            $('#fileForm').submit();
+        });
+
+        chart.draw(data, options);
+    }
+    </script>
+
+}

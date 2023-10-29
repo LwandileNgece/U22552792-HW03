@@ -1,0 +1,51 @@
+﻿@model IEnumerable<U22552792_HW03.Models.borrow>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.takenDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.broughtDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.book.name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.student.name)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.takenDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.broughtDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.book.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.student.name)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.borrowId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.borrowId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.borrowId })
+        </td>
+    </tr>
+}
+
+</table>

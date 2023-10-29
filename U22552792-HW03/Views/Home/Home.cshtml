@@ -1,0 +1,335 @@
+﻿@model U22552792_HW03.Models.DataViewModel
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Home";
+}
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <h2>Students</h2>
+            <p>
+                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#StudentModal">Create</a>
+            </p>
+            @*Student Create Modal*@
+            <div class="modal fade" id="StudentModal">
+                <!-- Modal content goes here -->
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="modal-title">
+                                Student information
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            @using (Html.BeginForm("Create", "students", FormMethod.Post, new { id = "studentForm" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewStudent.name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewStudent.name, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewStudent.name, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewStudent.surname, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewStudent.surname, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewStudent.surname, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewStudent.birthdate, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewStudent.birthdate, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewStudent.birthdate, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewStudent.gender, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewStudent.gender, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewStudent.gender, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewStudent.formclass, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewStudent.formclass, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewStudent.formclass, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewStudent.point, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewStudent.point, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewStudent.point, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" id="btnSaveStudent" value="Create" class="btn btn-primary">Save</button>
+                                    <button type="button" id="btnCancel" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*Student Table*@
+            <table class="table table-light table-striped">
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Surname
+                    </th>
+                    <th>
+                        Birthdate
+                    </th>
+                    <th>
+                        Gender
+                    </th>
+                    <th>
+                        Formclass
+                    </th>
+                </tr>
+                <tbody id="itemsContainer">
+                    @foreach (var item in Model.Students)
+                    {
+                        <tr class="item">
+                            <td>
+                                @Html.DisplayFor(modelItem => item.name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.surname)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.birthdate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.gender)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.formclass)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div id="paginationControls">
+                <button id="prevPage" class="btn btn-primary">Previous</button>
+                <span id="currentPage"></span>
+                <button id="nextPage" class="btn btn-primary">Next</button>
+            </div>
+        </div>
+        <div class="col-6">
+            <h2>Books</h2>
+            <p>
+                <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#BookModal">Create</a>
+            </p>
+            @*Book Modal*@
+            <div class="modal fade" id="BookModal">
+                <!-- Modal content goes here -->
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="modal-title">
+                                Book information
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            @using (Html.BeginForm("Create", "books", FormMethod.Post, new { id = "bookForm" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewBook.name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewBook.name, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewBook.name, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewBook.pagecount, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewBook.pagecount, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewBook.pagecount, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewBook.point, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NewBook.point, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NewBook.point, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewBook.author.authorId, "authorId", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.DropDownListFor(model => model.NewBook.authorId, new SelectList(Model.Authors, "authorId", "name"), "-- Select Author --", new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.NewBook.authorId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.NewBook.type.typeId, "typeId", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.DropDownListFor(model => model.NewBook.typeId, new SelectList(Model.Types, "typeId", "name"), "-- Select Type --", new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.NewBook.typeId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" id="btnSaveBook" value="Create" class="btn btn-primary">Save</button>
+                                    <button type="button" id="btnCancel" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*Book Table*@
+            <table class="table table-light table-striped">
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Page Count
+                    </th>
+                    <th>
+                        Point
+                    </th>
+                    <th>
+                        Author Name
+                    </th>
+                    <th>
+                        Type Name
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                </tr>
+                <tbody id="itemsContainer1">
+                    @foreach (var item in Model.Books)
+                    {
+                        <tr class="item1">
+                            <td>
+                                @Html.DisplayFor(modelItem => item.name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.pagecount)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.point)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.author.name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.type.name)
+                            </td>
+                            <td>
+                                Available
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div id="paginationControls1">
+                <button id="prevPage1" class="btn btn-primary">Previous</button>
+                <span id="currentPage1"></span>
+                <button id="nextPage1" class="btn btn-primary">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@*Student Pagination*@
+<script>
+    $(document).ready(function () {
+        var itemsPerPage = 10;
+        var currentPage = 1;
+
+        function showItems(startIndex, endIndex) {
+            $('#itemsContainer tr.item').hide();
+            $('#itemsContainer tr.item').slice(startIndex, endIndex).show();
+            $('#currentPage').text('Page ' + currentPage);
+        }
+
+        showItems(0, itemsPerPage);
+
+        $('#nextPage').on('click', function () {
+            var totalItems = $('#itemsContainer tr.item').length;
+            var totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            if (currentPage < totalPages) {
+                currentPage++;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+
+        $('#prevPage').on('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+    });
+</script>
+@*Book Pagination*@
+<script>
+    $(document).ready(function () {
+        var itemsPerPage = 10;
+        var currentPage = 1;
+
+        function showItems(startIndex, endIndex) {
+            $('#itemsContainer1 tr.item1').hide();
+            $('#itemsContainer1 tr.item1').slice(startIndex, endIndex).show();
+            $('#currentPage1').text('Page ' + currentPage);
+        }
+
+        showItems(0, itemsPerPage);
+
+        $('#nextPage1').on('click', function () {
+            var totalItems = $('#itemsContainer1 tr.item1').length;
+            var totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            if (currentPage < totalPages) {
+                currentPage++;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+
+        $('#prevPage1').on('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                var startIndex = (currentPage - 1) * itemsPerPage;
+                var endIndex = startIndex + itemsPerPage;
+                showItems(startIndex, endIndex);
+            }
+        });
+    });
+</script>

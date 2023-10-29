@@ -1,0 +1,58 @@
+﻿@model U22552792_HW03.Models.book
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>book</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.pagecount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.pagecount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.point)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.point)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.author.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.author.name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.type.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.type.name)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.bookId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
